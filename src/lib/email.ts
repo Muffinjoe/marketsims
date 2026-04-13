@@ -107,7 +107,7 @@ export async function sendWelcomeEmail({
       </div>
 
       <div style="text-align: center; padding: 24px;">
-        <div style="font-size: 40px; margin-bottom: 8px;">🎮</div>
+        <img src="https://marketsims.com/logo.png" alt="MarketSims" width="60" height="60" style="margin-bottom: 12px;" />
         <h2 style="margin: 0; font-size: 20px; color: #18181b;">
           Welcome to MarketSims, ${username}!
         </h2>
