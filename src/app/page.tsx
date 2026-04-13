@@ -49,8 +49,16 @@ function HomeContent() {
   useEffect(() => {
     const q = searchParams.get("q");
     const cat = searchParams.get("cat");
-    if (q) setSearch(q);
-    if (cat && CATEGORIES.includes(cat)) setCategory(cat);
+    if (q) {
+      setSearch(q);
+    } else {
+      setSearch("");
+    }
+    if (cat && CATEGORIES.includes(cat)) {
+      setCategory(cat);
+    } else if (!cat) {
+      setCategory("Trending");
+    }
   }, [searchParams]);
 
   // Update URL when category changes (so back button works)
