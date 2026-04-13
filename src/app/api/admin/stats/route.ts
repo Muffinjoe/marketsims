@@ -13,59 +13,42 @@ export async function POST(req: Request) {
   const weekAgo = new Date(Date.now() - 7 * 86400000);
   const monthAgo = new Date(Date.now() - 30 * 86400000);
 
-  const [
-    totalUsers,
-    usersToday,
-    usersThisWeek,
-    usersThisMonth,
-    totalPredictions,
-    predictionsToday,
-    predictionsThisWeek,
-    totalPositions,
-    resolvedPositions,
-    totalFollows,
-    totalActivities,
-    recentSignups,
-    topUsers,
-    dailySignups,
-  ] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { createdAt: { gte: today } } }),
-    prisma.user.count({ where: { createdAt: { gte: weekAgo } } }),
-    prisma.user.count({ where: { createdAt: { gte: monthAgo } } }),
-    prisma.activity.count({ where: { type: "PICK" } }),
-    prisma.activity.count({
-      where: { type: "PICK", createdAt: { gte: today } },
-    }),
-    prisma.activity.count({
-      where: { type: "PICK", createdAt: { gte: weekAgo } },
-    }),
-    prisma.position.count(),
-    prisma.position.count({ where: { resolved: true } }),
-    prisma.follow.count(),
-    prisma.activity.count(),
-    prisma.user.findMany({
-      select: { username: true, email: true, balance: true, createdAt: true },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
-    prisma.user.findMany({
-      select: {
-        username: true,
-        balance: true,
-        positions: {
-          select: { shares: true, avgPrice: true, resolved: true, won: true },
-        },
+  // Run queries sequentially to avoid connection pool exhaustion
+  const totalUsers = await prisma.user.count();
+  const usersToday = await prisma.user.count({ where: { createdAt: { gte: today } } });
+  const usersThisWeek = await prisma.user.count({ where: { createdAt: { gte: weekAgo } } });
+  const usersThisMonth = await prisma.user.count({ where: { createdAt: { gte: monthAgo } } });
+
+  const totalPredictions = await prisma.activity.count({ where: { type: "PICK" } });
+  const predictionsToday = await prisma.activity.count({ where: { type: "PICK", createdAt: { gte: today } } });
+  const predictionsThisWeek = await prisma.activity.count({ where: { type: "PICK", createdAt: { gte: weekAgo } } });
+
+  const totalPositions = await prisma.position.count();
+  const resolvedPositions = await prisma.position.count({ where: { resolved: true } });
+  const totalFollows = await prisma.follow.count();
+
+  const recentSignups = await prisma.user.findMany({
+    select: { username: true, email: true, balance: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+
+  const topUsers = await prisma.user.findMany({
+    select: {
+      username: true,
+      balance: true,
+      positions: {
+        select: { shares: true, avgPrice: true, resolved: true, won: true },
       },
-      orderBy: { balance: "desc" },
-      take: 10,
-    }),
-    // Daily signups for the last 14 days
-    prisma.user.findMany({
-      where: { createdAt: { gte: new Date(Date.now() - 14 * 86400000) } },
-      select: { createdAt: true },
-    }),
-  ]);
+    },
+    orderBy: { balance: "desc" },
+    take: 10,
+  });
+
+  const recentUsers = await prisma.user.findMany({
+    where: { createdAt: { gte: new Date(Date.now() - 14 * 86400000) } },
+    select: { createdAt: true },
+  });
 
   // Aggregate daily signups
   const dailyMap = new Map<string, number>();
@@ -73,7 +56,7 @@ export async function POST(req: Request) {
     const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     dailyMap.set(d, 0);
   }
-  for (const u of dailySignups) {
+  for (const u of recentUsers) {
     const d = u.createdAt.toISOString().slice(0, 10);
     dailyMap.set(d, (dailyMap.get(d) || 0) + 1);
   }
@@ -105,7 +88,6 @@ export async function POST(req: Request) {
       resolvedPositions,
       openPositions: totalPositions - resolvedPositions,
       totalFollows,
-      totalActivities,
     },
     recentSignups,
     topUsers: topUsersFormatted,

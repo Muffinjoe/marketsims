@@ -42,19 +42,24 @@ export default function AdminPage() {
   const login = async () => {
     setLoading(true);
     setError("");
-    const res = await fetch("/api/admin/stats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    if (!res.ok) {
-      setError("Wrong password");
-      setLoading(false);
-      return;
+    try {
+      const res = await fetch("/api/admin/stats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Wrong password");
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      setStats(data);
+      setAuthed(true);
+    } catch (err) {
+      setError("Failed to connect. Try again.");
     }
-    const data = await res.json();
-    setStats(data);
-    setAuthed(true);
     setLoading(false);
   };
 
