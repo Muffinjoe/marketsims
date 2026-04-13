@@ -90,22 +90,7 @@ export async function resolvePositions(): Promise<{
           totalPaid++;
         }
 
-        // Send resolution email
-        const posUser = await prisma.user.findUnique({
-          where: { id: position.userId },
-          select: { email: true, username: true },
-        });
-        if (posUser) {
-          sendResolutionEmail({
-            to: posUser.email,
-            username: posUser.username,
-            question: position.question,
-            outcome: position.outcome,
-            shares: position.shares,
-            won,
-            payout,
-          }).catch(() => {});
-        }
+        // Emails sent separately via digest cron, not per-resolution
 
         totalResolved++;
       }
