@@ -119,6 +119,11 @@ export default function MarketDetail({ market }: { market: PolymarketMarket }) {
           {/* Price chart */}
           <PriceChart tokenId={market.clobTokenIds[0] || ""} />
 
+          {/* Trade panel — mobile only (shows between chart and rules) */}
+          <div className="lg:hidden">
+            <TradePanel market={market} />
+          </div>
+
           {/* Rules / Market Context tabs */}
           <div className="card-glow">
             <div className="flex border-b border-zinc-100">
@@ -159,7 +164,10 @@ export default function MarketDetail({ market }: { market: PolymarketMarket }) {
 
         {/* Right column */}
         <div className="space-y-4">
-          <TradePanel market={market} />
+          {/* Trade panel — desktop only (mobile version is above rules) */}
+          <div className="hidden lg:block">
+            <TradePanel market={market} />
+          </div>
 
           {/* Polymarket CTA — signed in only */}
           {user && (
