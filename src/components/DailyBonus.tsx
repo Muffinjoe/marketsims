@@ -23,6 +23,14 @@ export default function DailyBonus() {
 
   useEffect(() => {
     if (!user) return;
+
+    // Don't show daily bonus if user just signed up (within last 60 seconds)
+    const joined = new Date(user.createdAt || 0).getTime();
+    if (Date.now() - joined < 60000) {
+      setState("claimed");
+      return;
+    }
+
     fetch("/api/login-bonus")
       .then((r) => r.json())
       .then((data) => {

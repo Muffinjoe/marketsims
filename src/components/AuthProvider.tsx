@@ -16,6 +16,7 @@ interface User {
   username: string;
   balance: number;
   referralCode: string;
+  createdAt?: string;
 }
 
 interface AuthContextType {

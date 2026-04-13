@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Lampost12!";
+const ADMIN_PASSWORD = "Lampost12!";
 
 export async function POST(req: Request) {
   const { password } = await req.json();

@@ -36,24 +36,26 @@ export async function GET(req: Request) {
 
   const config = CATEGORY_CONFIG[category];
 
-  // Ending soon — fetch more, filter to future end dates, sort by soonest
+  // Ending soon — fetch popular markets, filter to those ending within 7 days
   if (config?.type === "ending") {
     const all = await getMarkets({
-      limit: 200,
+      limit: 100,
       offset: 0,
       active: true,
       closed: false,
-      order: "endDate",
-      ascending: true,
+      order: "volume24hr",
+      ascending: false,
     });
 
-    const now = new Date();
+    const now = Date.now();
+    const weekFromNow = now + 7 * 86400000;
     const ending = all
       .filter((m) => {
         if (!m.endDate) return false;
-        const end = new Date(m.endDate);
-        return end > now;
+        const end = new Date(m.endDate).getTime();
+        return end > now && end < weekFromNow;
       })
+      .sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
       .slice(offset, offset + limit);
 
     return Response.json({ markets: ending });
