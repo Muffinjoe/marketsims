@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "./AuthProvider";
 import ShareButton from "./ShareButton";
+import { pixelPrediction } from "@/lib/pixel";
 import type { PolymarketMarket } from "@/lib/polymarket";
 
 export default function TradePanel({ market }: { market: PolymarketMarket }) {
@@ -55,9 +56,10 @@ export default function TradePanel({ market }: { market: PolymarketMarket }) {
       );
       setAmount("");
       refreshUser();
-      // Update daily challenge streak
+      // Update daily challenge streak + track pixel
       if (side === "BUY") {
         fetch("/api/daily", { method: "POST" }).catch(() => {});
+        pixelPrediction(market.question);
       }
     }
     setSubmitting(false);

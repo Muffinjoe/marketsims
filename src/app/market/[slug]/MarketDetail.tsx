@@ -5,6 +5,7 @@ import PriceChart from "@/components/PriceChart";
 import { useAuth } from "@/components/AuthProvider";
 import type { PolymarketMarket } from "@/lib/polymarket";
 import { marketUrl } from "@/lib/slugify";
+import { pixelViewMarket } from "@/lib/pixel";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -30,6 +31,11 @@ export default function MarketDetail({ market }: { market: PolymarketMarket }) {
     if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}K`;
     return `$${v.toFixed(0)}`;
   };
+
+  // Track market view
+  useEffect(() => {
+    pixelViewMarket(market.question);
+  }, [market.question]);
 
   // Load related/trending markets
   useEffect(() => {

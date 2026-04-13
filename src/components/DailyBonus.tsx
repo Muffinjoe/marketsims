@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "./AuthProvider";
+import { pixelDailyBonus } from "@/lib/pixel";
 
 const EMOJIS = ["🎉", "💰", "🤑", "✨", "🎊", "⭐", "🔥", "💎", "🏆", "🎯"];
 
@@ -53,6 +54,7 @@ export default function DailyBonus() {
     setAmount(data.amount);
     setLabel(data.label);
     setState("won");
+    pixelDailyBonus();
     refreshUser();
 
     // Launch celebration particles

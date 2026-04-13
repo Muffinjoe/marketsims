@@ -1,5 +1,7 @@
 "use client";
 
+import { pixelShare } from "@/lib/pixel";
+
 export default function ShareButton({
   text,
   compact,
@@ -11,6 +13,7 @@ export default function ShareButton({
   const shareText = `${text}\n\nMake your own predictions at MarketSims.com`;
 
   const shareToX = () => {
+    pixelShare();
     window.open(
       `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`,
       "_blank",

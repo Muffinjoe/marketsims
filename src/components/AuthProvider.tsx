@@ -1,5 +1,6 @@
 "use client";
 
+import { pixelSignup, pixelLogin } from "@/lib/pixel";
 import {
   createContext,
   useContext,
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     setUser(data);
+    pixelLogin();
   };
 
   const signup = async (
@@ -76,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     setUser(data);
+    pixelSignup();
   };
 
   const logout = async () => {
