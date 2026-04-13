@@ -39,8 +39,8 @@ export default function DailyBonus() {
   const claim = useCallback(async () => {
     setState("spinning");
 
-    // Spin animation
-    await new Promise((r) => setTimeout(r, 1500));
+    // Spin animation — build suspense
+    await new Promise((r) => setTimeout(r, 3000));
 
     const res = await fetch("/api/login-bonus", { method: "POST" });
     const data = await res.json();
@@ -58,16 +58,16 @@ export default function DailyBonus() {
     refreshUser();
 
     // Launch celebration particles
-    const newParticles: Particle[] = Array.from({ length: 20 }, (_, i) => ({
+    const newParticles: Particle[] = Array.from({ length: 35 }, (_, i) => ({
       id: i,
       emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
       x: Math.random() * 100,
-      delay: Math.random() * 0.5,
-      duration: 1.5 + Math.random() * 1.5,
+      delay: Math.random() * 1.5,
+      duration: 2.5 + Math.random() * 2,
     }));
     setParticles(newParticles);
 
-    setTimeout(() => setParticles([]), 3500);
+    setTimeout(() => setParticles([]), 6000);
   }, [refreshUser]);
 
   if (!user || state === "claimed" || state === "checking") return null;
