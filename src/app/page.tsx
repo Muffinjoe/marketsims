@@ -9,6 +9,7 @@ import type { PolymarketMarket } from "@/lib/polymarket";
 const CATEGORIES = [
   "Trending",
   "Breaking",
+  "Ending",
   "New",
   "Politics",
   "Sports",

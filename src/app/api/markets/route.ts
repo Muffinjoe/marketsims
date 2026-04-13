@@ -3,10 +3,11 @@ import { getMarkets, searchMarkets, getMarketsByTag } from "@/lib/polymarket";
 // Map frontend category names to API params
 const CATEGORY_CONFIG: Record<
   string,
-  { type: "sort" | "tag"; value: string }
+  { type: "sort" | "tag" | "ending"; value: string }
 > = {
   Trending: { type: "sort", value: "volume24hr" },
   Breaking: { type: "sort", value: "competitive" },
+  Ending: { type: "ending", value: "endDate" },
   New: { type: "sort", value: "startDate" },
   Politics: { type: "tag", value: "politics" },
   Sports: { type: "tag", value: "sports" },
@@ -34,6 +35,29 @@ export async function GET(req: Request) {
   }
 
   const config = CATEGORY_CONFIG[category];
+
+  // Ending soon — fetch more, filter to future end dates, sort by soonest
+  if (config?.type === "ending") {
+    const all = await getMarkets({
+      limit: 200,
+      offset: 0,
+      active: true,
+      closed: false,
+      order: "endDate",
+      ascending: true,
+    });
+
+    const now = new Date();
+    const ending = all
+      .filter((m) => {
+        if (!m.endDate) return false;
+        const end = new Date(m.endDate);
+        return end > now;
+      })
+      .slice(offset, offset + limit);
+
+    return Response.json({ markets: ending });
+  }
 
   // Tag-based categories — use events API
   if (config?.type === "tag") {
